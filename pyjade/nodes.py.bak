@@ -87,7 +87,7 @@ class Conditional(Node):
 		self.block = block
 		self.next = []
 	def can_append(self,type):
-		n = (self.__next__ and self.next[-1].type) or self.type
+		n = (self.next and self.next[-1].type) or self.type
 		return type in self.may_contain_tags.get(n,[])
 	def append(self,next):
 		self.next.append(next)
@@ -115,7 +115,7 @@ class Tag(Node):
 
 	@classmethod
 	def static(self, string, only_remove=False):
-		if not isinstance(string,str) or not string: return string
+		if not isinstance(string,basestring) or not string: return string
 		if string[0] in ('"',"'"):
 			if string[0]==string[-1]: string = string[1:-1]
 			else: return string
@@ -164,7 +164,7 @@ class Tag(Node):
 class Text(Node):
 	def __init__(self, line=None):
 		self.nodes = []
-		if isinstance(line,str): self.append(line)
+		if isinstance(line,basestring): self.append(line)
 
 	def append(self,node):
 		return self.nodes.append(node)

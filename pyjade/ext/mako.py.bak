@@ -58,7 +58,7 @@ class Compiler(_Compiler):
         self.buf.append('\\\n%% %s:\n'%TYPE_CODE[conditional.type](conditional.sentence))
         if conditional.block:
             self.visit(conditional.block)
-            for next in conditional.__next__:
+            for next in conditional.next:
               self.visitConditional(next)
         if conditional.type in ['if','unless']: self.buf.append('\\\n% endif\n')
 

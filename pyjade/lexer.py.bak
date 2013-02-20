@@ -79,7 +79,7 @@ class Lexer(object):
         while True:
             fetch -=1
             if not fetch>=0: break
-            self.stash.append(next(self))
+            self.stash.append(self.next())
         return self.stash[n-1]
 
     def indexOfDelimiters(self,start,end):
@@ -114,7 +114,7 @@ class Lexer(object):
         captures = regexec(self.RE_BLANK,self.input)
         if captures:
             self.consume(len(captures[0])-1)
-            return next(self)
+            return self.next()
 
     def comment(self):
         captures = regexec(self.RE_COMMENT,self.input)
@@ -238,7 +238,7 @@ class Lexer(object):
         if captures:
             self.consume(len(captures[0]))
             tok = self.tok('each',None)
-            tok.keys = [x.strip() for x in captures[1].split(',')]
+            tok.keys = map(lambda x:x.strip(),captures[1].split(','))
             tok.code = captures[2]
             return tok
 
@@ -263,12 +263,12 @@ class Lexer(object):
             colons = self.colons
             states = ['key']
             class Namespace:
-                key = ''
-                val = ''
-                quote = ''
+                key = u''
+                val = u''
+                quote = u''
                 literal = True
                 def reset(self):
-                    self.key = self.val = self.quote = ''
+                    self.key = self.val = self.quote = u''
                     self.literal = True
                 def __str__(self):
                     return dict(key=self.key,val=self.val,quote=self.quote,literal=self.literal).__str__()
@@ -283,10 +283,10 @@ class Lexer(object):
                 return attr, (num>0)
 
             self.consume(index+1)
-            from .utils import odict
+            from utils import odict
             tok.attrs = odict()
             tok.static_attrs = set()
-            str_nums = list(map(str,list(range(10))))
+            str_nums = map(str,range(10))
             def parse(c):
                 real = c
                 if colons and ':'==c: c = '='
@@ -413,9 +413,9 @@ class Lexer(object):
         return self.scan(self.RE_COLON,':')
 
     def advance(self):
-        return self.stashed() or next(self)
+        return self.stashed() or self.next()
 
-    def __next__(self):
+    def next(self):
         return self.deferred() \
             or self.blank() \
             or self.eos() \

@@ -9,7 +9,7 @@ def process_param(key, value, terse=False):
     if terse:
         if (key == value) or (value is True):
             return key
-    if isinstance(value, str):
+    if isinstance(value, basestring):
         value = value.decode('utf8')
     return '''%s="%s"''' % (key, value)
 
@@ -44,7 +44,7 @@ class Compiler(_Compiler):
  
     def visitEach(self,each):
         #self.buf.append('{%% for %s in %s %%}'%(','.join(each.keys),each.obj))
-        __i = next(self._i)
+        __i = self._i.next()
         self.buf.append('<%% for (_i_%s = 0, _len_%s = %s.length; _i_%s < _len_%s; _i_%s++) { ' %(__i, __i, each.obj, __i, __i, __i))
         if len(each.keys) > 1:
           for i, k in enumerate(each.keys):
@@ -57,7 +57,7 @@ class Compiler(_Compiler):
         self.buf.append('<% } %>')
 
     def _do_eval(self, value):
-        if isinstance(value, str):
+        if isinstance(value, basestring):
             value = value.encode('utf-8')
         try:
             value = eval(value, {}, {})
@@ -69,7 +69,7 @@ class Compiler(_Compiler):
         value = attr['val']
         if attr['static']:
             return attr['val']
-        if isinstance(value, str):
+        if isinstance(value, basestring):
             return self._do_eval(value)
         else:
             return attr['name']
@@ -89,7 +89,7 @@ class Compiler(_Compiler):
                 if (value is not None) and (value is not False):
                     params.append((attr['name'], value))
         if classes:
-            classes = [str(c) for c in classes]
+            classes = [unicode(c) for c in classes]
             params.append(('class', " ".join(classes)))
         if params:
             self.buf.append(" "+" ".join([process_param(k, v, self.terse) for (k,v) in params]))
@@ -104,7 +104,7 @@ class Compiler(_Compiler):
         self.buf.append('\n<%% %s { %%>'%TYPE_CODE[conditional.type](conditional.sentence))
         if conditional.block:
             self.visit(conditional.block)
-            for next in conditional.__next__:
+            for next in conditional.next:
               self.visitConditional(next)
         if conditional.type in ['if','unless']: self.buf.append('\n<% } %>\n')
         

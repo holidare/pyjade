@@ -1,4 +1,4 @@
-from .utils import odict
+from utils import odict
 import types
 
 try:
@@ -31,7 +31,7 @@ def escape(s):
         return s.__html__()
 
     if isinstance(s, str):
-        s = str(str(s), 'utf8')
+        s = unicode(str(s), 'utf8')
     else:
         s = str(s)
     
@@ -86,7 +86,7 @@ def iteration(obj, num_keys):
     head = next(iter(obj), None)
     if head:
         try:
-            if not isinstance(head, str):
+            if not isinstance(head, types.StringTypes):
                 card = len(head)
                 if num_keys == card:
                     return obj

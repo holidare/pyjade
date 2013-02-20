@@ -57,7 +57,7 @@ try:
 
     def django_process(str):
         compiled = process(str,filename=None,compiler = DjangoCompiler)
-        print(compiled)
+        print compiled
         t = django.template.Template(compiled)
 
         ctx = django.template.Context()
@@ -101,8 +101,8 @@ def run_case(case,process):
     html_file.close()
     try:
         processed_jade = process(jade_src).strip('\n')
-        print('PROCESSED\n',processed_jade,len(processed_jade))
-        print('EXPECTED\n',html_src,len(html_src))
+        print 'PROCESSED\n',processed_jade,len(processed_jade)
+        print 'EXPECTED\n',html_src,len(html_src)
         assert processed_jade==html_src
 
     except CurrentlyNotSupported:
@@ -122,9 +122,9 @@ def test_case_generator():
     import os
     for dirname, dirnames, filenames in os.walk('cases/'):
         # raise Exception(filenames)
-        filenames = [x for x in filenames if x.endswith('.jade')]
-        filenames = [x.replace('.jade','') for x in filenames]
-        for processor in list(processors.keys()):
+        filenames = filter(lambda x:x.endswith('.jade'),filenames)
+        filenames = map(lambda x:x.replace('.jade',''),filenames)
+        for processor in processors.keys():
             for filename in filenames:
                 if not filename in exclusions[processor]:
                     yield run_case, filename,processor
